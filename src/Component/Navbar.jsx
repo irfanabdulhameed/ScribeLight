@@ -48,7 +48,7 @@ const Navbar = () => {
       to={to}
       className={({ isActive }) =>
         `text-md ${
-          isActive ? "font-semibold" : ""
+          isActive ? "font-bold" : ""
         } hover:text-gray-300 transition-colors`
       }
       onClick={() => setIsOpen(false)}
@@ -58,7 +58,7 @@ const Navbar = () => {
   );
 
   return (
-    <nav className="flex items-center justify-between py-6 px-4 md:px-10">
+    <nav className="flex items-center justify-between py-8 px-4 md:px-10">
       <div className="flex-shrink-0">
         <Link to="/">
           <img className="w-32 md:w-40" src={logo} alt="Logo" />

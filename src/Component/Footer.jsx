@@ -40,7 +40,7 @@ export default function Footer() {
           </nav>
         </div>
         <div className="mt-8 text-center text-gray-500 text-sm">
-          © {new Date().getFullYear()} Company Name. All rights reserved.
+          © {new Date().getFullYear()} ScribeLight. All rights reserved.
         </div>
       </div>
     </footer>
