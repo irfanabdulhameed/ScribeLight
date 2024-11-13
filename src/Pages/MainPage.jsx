@@ -1,7 +1,13 @@
-import React from "react";
+import HeroSection from "../Component/Hero";
+import BG from "../Component/BG";
+import Footer from "../Component/Footer";
 
-const MainPage = () => {
-  return <div>HomePage</div>;
-};
-
-export default MainPage;
+export default function Home() {
+  return (
+    <div>
+      <BG />
+      <HeroSection />
+      <Footer />
+    </div>
+  );
+}
