@@ -1,21 +1,28 @@
 // import { Button } from "@/components/ui/button";
 import Summarizebtn from "./summarize-btn";
+import ytLogo from "../assets/ytlogo.png";
+import paperImg from "../assets/paper.png";
 
 export default function HeroSection() {
   return (
     <section
-      className="mt-10 relative w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-center bg-contain bg-no-repeat mb-40"
+      className=" relative w-full lg:py-32 xl:py-48 bg-center bg-contain bg-no-repeat mb-40"
       style={{
         backgroundImage: 'url("../src/assets/grid.png")',
         backgroundSize: "100% 100%",
       }}
     >
+      <div className="absolute top-40 left-20 w-80 h-80 ">
+        <img src={ytLogo} className="floating w-80 hidden lg:block"></img>
+      </div>{" "}
+      <div className="absolute top-40 right-20 w-80 h-80 ">
+        <img src={paperImg} className="floatingg  w-80 hidden lg:block"></img>
+      </div>
       <div className="absolute inset-0" />
-
       <div className="relative container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-5xl xl:text-6xl/none">
+            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-xl sm:mt-20 md:text-5xl xl:text-6xl/none">
               Skip the watch!{""}
               <span
                 className="text-red-500 p-6"

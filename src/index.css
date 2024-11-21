@@ -7,3 +7,43 @@
 :root {
   font-family: "Anek Latin", sans-serif;
 }
+.floating {
+  @apply animate-floating;
+}
+
+@keyframes floating {
+  0% {
+    transform: translate(0, 0px);
+  }
+  50% {
+    transform: translate(0, 15px);
+  }
+  100% {
+    transform: translate(0, -0px);
+  }
+}
+
+.floatingg {
+  @apply animate-floating;
+}
+
+@keyframes floatingg {
+  0% {
+    transform: translate(0, -15px);
+  }
+  50% {
+    transform: translate(0, 0px);
+  }
+  100% {
+    transform: translate(0, 15px);
+  }
+}
+
+@layer utilities {
+  .animate-floating {
+    animation: floating 2s ease-in-out infinite;
+  }
+  .animate-floating_2 {
+    animation: floatingg 2s ease-in-out infinite;
+  }
+}
