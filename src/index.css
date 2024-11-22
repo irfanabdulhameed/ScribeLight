@@ -5,7 +5,8 @@
 @tailwind utilities;
 
 :root {
-  font-family: "Anek Latin", sans-serif;
+  /* font-family: "Anek Latin", sans-serif; */
+  font-family: "Poppins", sans-serif;
 }
 .floating {
   @apply animate-floating;
@@ -46,4 +47,9 @@
   .animate-floating_2 {
     animation: floatingg 2s ease-in-out infinite;
   }
+
+
+  
 }
+
+
