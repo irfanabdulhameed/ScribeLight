@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 
-
 function Chatbox() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
@@ -13,13 +12,12 @@ function Chatbox() {
     setMessages((prev) => [...prev, { sender: "user", text: input }]);
 
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/number-fact`, {
+      const response = await fetch("http://127.0.0.1:5000/api/number-fact", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ number: input }),
       });
+
       const data = await response.json();
 
       if (response.ok) {

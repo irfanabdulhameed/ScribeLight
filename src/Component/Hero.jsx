@@ -12,7 +12,7 @@ export default function HeroSection() {
         backgroundSize: "100% 100%",
       }}
     >
-      <div className="absolute top-40 left-20 w-80 h-80 ">
+      <div className="absolute top-40 left-14 w-80 h-80 ">
         <img src={ytLogo} className="floating w-80 hidden lg:block"></img>
       </div>{" "}
       <div className="absolute top-40 right-20 w-80 h-80 ">
