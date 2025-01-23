@@ -35,7 +35,7 @@ const Ytinput = () => {
 
   return (
     <div className="flex items-center justify-center">
-      <div className="w-full max-w-md px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md  sm:px-6 lg:px-8">
         <p className="mt-3 max-w-md mx-auto text-white text-center sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
           Enter a YouTube link to summarize and chat!
         </p>
@@ -74,7 +74,7 @@ const Ytinput = () => {
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
-                className="w-full h-full rounded-lg shadow-lg"
+                className="w-full h-12 rounded-lg shadow-lg"
               ></iframe>
             </div>
           )
