@@ -1,313 +1,147 @@
-// import React, { useState, useEffect, useRef } from "react";
-
-// function Chatbox({ transcript }) {
-//   const [input, setInput] = useState("");
-//   const [messages, setMessages] = useState([]);
-//   const textareaRef = useRef(null);
-
-//   // Automatically add transcript to chat when it becomes available
-//   useEffect(() => {
-//     if (transcript) {
-//       setMessages((prev) => [
-//         ...prev,
-//         {
-//           sender: "bot",
-//           text: `**Video Transcript**:\n${transcript}`,
-//         },
-//       ]);
-//     }
-//   }, [transcript]);
-
-//   const fetchGeminiResponse = async () => {
-//     if (!input.trim()) return;
-
-//     // Add user message
-//     setMessages((prev) => [...prev, { sender: "user", text: input }]);
-
-//     try {
-//       const response = await fetch("http://127.0.0.1:5000/api/process-text", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({
-//           text: input,
-//           transcript: transcript,
-//         }),
-//       });
-
-//       const data = await response.json();
-
-//       if (response.ok) {
-//         setMessages((prev) => [
-//           ...prev,
-//           { sender: "bot", text: data.processed_text },
-//         ]);
-//       } else {
-//         setMessages((prev) => [
-//           ...prev,
-//           { sender: "bot", text: data.error || "Error" },
-//         ]);
-//       }
-//     } catch (err) {
-//       setMessages((prev) => [
-//         ...prev,
-//         { sender: "bot", text: "Connection error" },
-//       ]);
-//     }
-
-//     setInput("");
-//     adjustTextareaHeight();
-//   };
-
-//   // Handle Enter key press
-//   const handleKeyPress = (e) => {
-//     if (e.key === "Enter" && !e.shiftKey) {
-//       e.preventDefault(); // Prevent newline
-//       fetchGeminiResponse(); // Trigger API call
-//     }
-//   };
-
-//   // Adjust textarea height dynamically
-//   const adjustTextareaHeight = () => {
-//     if (textareaRef.current) {
-//       textareaRef.current.style.height = "auto";
-//       const maxHeight =
-//         3 * parseFloat(getComputedStyle(textareaRef.current).lineHeight);
-//       textareaRef.current.style.height = `${Math.min(
-//         textareaRef.current.scrollHeight,
-//         maxHeight
-//       )}px`;
-//     }
-//   };
-
-//   useEffect(() => {
-//     adjustTextareaHeight();
-//   }, [input]);
-
-//   return (
-//     <div>
-//       <div className="flex justify-center items-center min-h-screen mb-10">
-//         <div className="w-[calc(100%-50px)] max-h-screen border-2 border-gray-300 rounded-xl shadow-md p-4">
-//           <div className="h-[80vh] overflow-y-auto flex flex-col gap-4 p-2">
-//             {messages.map((message, index) => (
-//               <AnimatedBubbleMessage key={index} message={message} />
-//             ))}
-//           </div>
-
-//           {/* Input area */}
-//           <div className="mt-4 flex items-center">
-//             <textarea
-//               ref={textareaRef}
-//               value={input}
-//               onChange={(e) => setInput(e.target.value)}
-//               onKeyPress={handleKeyPress}
-//               placeholder="Ask me anything..."
-//               rows="1"
-//               className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 resize-none overflow-hidden"
-//               style={{ minHeight: "1.5rem" }}
-//             ></textarea>
-//             <button
-//               onClick={fetchGeminiResponse}
-//               className="ml-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-//             >
-//               Send
-//             </button>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// // Animated Bubble Message Component
-// function AnimatedBubbleMessage({ message }) {
-//   const [visible, setVisible] = useState(false);
-
-//   useEffect(() => {
-//     const timeout = setTimeout(() => setVisible(true), 10);
-//     return () => clearTimeout(timeout);
-//   }, []);
-
-//   return (
-//     <div
-//       className={`relative max-w-[75%] transition-transform duration-300 break-words ${
-//         visible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-//       } ${
-//         message.sender === "user"
-//           ? "self-end bg-red-500 text-white rounded-bl-3xl rounded-tl-3xl rounded-br-3xl"
-//           : "self-start bg-white text-black rounded-bl-3xl rounded-br-3xl rounded-tr-3xl"
-//       } p-3`}
-//     >
-//       {message.text}
-//       {/* Bubble Tail */}
-//       <div
-//         className={`absolute w-0 h-0 border-t-[10px] border-b-[10px] ${
-//           message.sender === "user"
-//             ? "border-l-[10px] border-red-500 border-t-transparent border-b-transparent right-0 top-1/2 -translate-y-1/2"
-//             : "border-r-[10px] border-white border-t-transparent border-b-transparent left-0 top-1/2 -translate-y-1/2"
-//         }`}
-//       ></div>
-//     </div>
-//   );
-// }
-
-// export default Chatbox;
-
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef, useEffect } from 'react';
+import { Loader } from 'lucide-react';
 
 const Chatbox = ({ transcript }) => {
-  const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
-  const textareaRef = useRef(null);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [highlightedText, setHighlightedText] = useState('');
+  const chatRef = useRef(null);
+  const minimapRef = useRef(null);
 
-  // Automatically add the transcript to the chat when it's available
   useEffect(() => {
     if (transcript) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: "bot",
-          text: `**Video Transcript**:\n${transcript}`,
-        },
-      ]);
+      setMessages([{ type: 'transcript', content: transcript }]);
     }
   }, [transcript]);
 
-  // Send user input to the backend and get a response
-  const fetchResponse = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     if (!input.trim()) return;
 
-    // Add user message to the chat
-    setMessages((prev) => [...prev, { sender: "user", text: input }]);
+    setLoading(true);
+    setMessages(prev => [...prev, { type: 'user', content: input }]);
+    setInput('');
 
     try {
-      const response = await fetch("http://localhost:5000/api/process-text", {
-        method: "POST",
+      const response = await fetch('http://localhost:5000/api/process-text', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           text: input,
-          transcript: transcript,
+          transcript,
         }),
       });
 
       const data = await response.json();
 
-      if (response.ok) {
-        // Add bot response to the chat
-        setMessages((prev) => [
-          ...prev,
-          { sender: "bot", text: data.processed_text },
-        ]);
-      } else {
-        // Handle errors
-        setMessages((prev) => [
-          ...prev,
-          { sender: "bot", text: data.error || "Something went wrong!" },
-        ]);
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to process text');
       }
-    } catch (err) {
-      // Handle network errors
-      setMessages((prev) => [
-        ...prev,
-        { sender: "bot", text: "An error occurred. Please try again." },
-      ]);
-    }
 
-    // Clear the input field
-    setInput("");
-    adjustTextareaHeight();
-  };
-
-  // Handle Enter key press
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      fetchResponse();
+      setMessages(prev => [...prev, { type: 'ai', content: data.processed_text }]);
+    } catch (error) {
+      setMessages(prev => [...prev, { type: 'error', content: error.message }]);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Adjust textarea height dynamically
-  const adjustTextareaHeight = () => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      const maxHeight =
-        3 * parseFloat(getComputedStyle(textareaRef.current).lineHeight);
-      textareaRef.current.style.height = `${Math.min(
-        textareaRef.current.scrollHeight,
-        maxHeight
-      )}px`;
-    }
+  const handleHighlight = (text) => {
+    setHighlightedText(text);
   };
 
-  useEffect(() => {
-    adjustTextareaHeight();
-  }, [input]);
+  const renderMessage = (message, index) => {
+    const isHighlighted = highlightedText && message.content.includes(highlightedText);
 
-  return (
-    <div>
-      <div className="flex justify-center items-center min-h-screen mb-10">
-        <div className="w-[calc(100%-50px)] max-h-screen border-2 border-gray-300 rounded-xl shadow-md p-4">
-          {/* Messages Area */}
-          <div className="h-[80vh] overflow-y-auto flex flex-col gap-4 p-2">
-            {messages.map((message, index) => (
-              <AnimatedBubbleMessage key={index} message={message} />
+    return (
+      <div
+        key={index}
+        className={`p-4 rounded-lg mb-4 ${
+          message.type === 'user'
+            ? 'bg-blue-600 ml-auto max-w-[80%]'
+            : message.type === 'ai'
+            ? 'bg-neutral-800 mr-auto max-w-[80%]'
+            : message.type === 'transcript'
+            ? 'bg-neutral-700 w-full'
+            : 'bg-red-600 text-white'
+        }`}
+      >
+        {message.type === 'transcript' ? (
+          <div className="prose prose-invert max-w-none">
+            {message.content.split(' ').map((word, i) => (
+              <span
+                key={i}
+                className={`cursor-pointer hover:bg-yellow-500/20 ${
+                  isHighlighted && word === highlightedText ? 'bg-yellow-500/30' : ''
+                }`}
+                onClick={() => handleHighlight(word)}
+              >
+                {word}{' '}
+              </span>
             ))}
           </div>
-
-          {/* Input Area */}
-          <div className="mt-4 flex items-center">
-            <textarea
-              ref={textareaRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Ask me anything..."
-              rows="1"
-              className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 resize-none overflow-hidden"
-              style={{ minHeight: "1.5rem" }}
-            ></textarea>
-            <button
-              onClick={fetchResponse}
-              className="ml-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-            >
-              Send
-            </button>
-          </div>
-        </div>
+        ) : (
+          <p className="whitespace-pre-wrap">{message.content}</p>
+        )}
       </div>
-    </div>
-  );
-};
-
-// Animated Bubble Message Component
-const AnimatedBubbleMessage = ({ message }) => {
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => setVisible(true), 10);
-    return () => clearTimeout(timeout);
-  }, []);
+    );
+  };
 
   return (
-    <div
-      className={`relative max-w-[75%] transition-transform duration-300 break-words ${
-        visible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-      } ${
-        message.sender === "user"
-          ? "self-end bg-red-500 text-white rounded-bl-3xl rounded-tl-3xl rounded-br-3xl"
-          : "self-start bg-white text-black rounded-bl-3xl rounded-br-3xl rounded-tr-3xl"
-      } p-3`}
-    >
-      {message.text}
-      {/* Bubble Tail */}
-      <div
-        className={`absolute w-0 h-0 border-t-[10px] border-b-[10px] ${
-          message.sender === "user"
-            ? "border-l-[10px] border-red-500 border-t-transparent border-b-transparent right-0 top-1/2 -translate-y-1/2"
-            : "border-r-[10px] border-white border-t-transparent border-b-transparent left-0 top-1/2 -translate-y-1/2"
-        }`}
-      ></div>
+    <div className="flex flex-col h-[calc(100vh-200px)]">
+      {/* Main chat area */}
+      <div className="flex-1 overflow-y-auto p-4" ref={chatRef}>
+        {messages.map((message, index) => renderMessage(message, index))}
+        {loading && (
+          <div className="flex items-center gap-2 text-neutral-400">
+            <Loader className="w-4 h-4 animate-spin" />
+            <span>AI is thinking...</span>
+          </div>
+        )}
+      </div>
+
+      {/* Minimap */}
+      <div className="w-48 border-l border-neutral-700 overflow-hidden">
+        <div
+          ref={minimapRef}
+          className="h-full overflow-y-auto text-xs text-neutral-400 p-2"
+        >
+          {messages.map((message, index) => (
+            <div
+              key={index}
+              className={`mb-1 ${
+                message.type === 'user' ? 'text-blue-400' : 'text-neutral-500'
+              }`}
+            >
+              {message.content.substring(0, 50)}...
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Input form */}
+      <form onSubmit={handleSubmit} className="p-4 bg-neutral-900 border-t border-neutral-800">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask a question about the video..."
+            className="flex-1 px-4 py-2 rounded-lg bg-neutral-800 text-white border border-neutral-700 focus:outline-none focus:border-blue-500"
+            disabled={loading}
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Send
+          </button>
+        </div>
+      </form>
     </div>
   );
 };
