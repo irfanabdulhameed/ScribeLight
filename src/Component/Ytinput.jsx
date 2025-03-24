@@ -5,29 +5,36 @@ const Ytinput = ({ onTranscriptReceived }) => {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/transcribe', {
+      const response = await fetch('http://127.0.0.1:5000/api/transcribe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        mode: 'cors',
         body: JSON.stringify({ url }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to transcribe video');
+        // More specific error handling based on error type
+        if (data.error && data.error.includes('ffprobe and ffmpeg not found')) {
+          throw new Error('Server missing required dependencies (ffmpeg). Please contact support.');
+        } else {
+          throw new Error(data.error || 'Failed to transcribe video');
+        }
       }
 
       onTranscriptReceived(data.transcript);
     } catch (err) {
+      console.error('Transcription error:', err);
       setError(err.message);
     } finally {
       setLoading(false);
