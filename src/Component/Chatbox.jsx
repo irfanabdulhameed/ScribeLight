@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Loader, Eye, EyeOff, Edit } from 'lucide-react';
+import AiLoader from '../Misc/AI-Loader';
 
 const Chatbox = ({ transcript }) => {
   const [messages, setMessages] = useState([]);
@@ -89,11 +90,11 @@ const Chatbox = ({ transcript }) => {
     return (
       <div
         key={index}
-        className={`p-4 rounded-lg mb-4 ${
+        className={`p-4  mb-4 ${
           message.type === 'user'
-            ? 'bg-blue-700 ml-auto max-w-[80%] text-white shadow-md'
+            ? 'bg-neutral-900 border border-gray-600 ml-auto max-w-[80%] text-white text-sm rounded-xl'
             : message.type === 'ai'
-            ? 'bg-gray-800 mr-auto max-w-[80%] border border-gray-600 shadow-md text-white'
+            ? 'bg-nuetral-900 mr-auto max-w-[80%]  text-white text-sm'
             : message.type === 'transcript'
             ? 'bg-neutral-700 w-full'
             : 'bg-red-600 text-white'
@@ -105,7 +106,7 @@ const Chatbox = ({ transcript }) => {
               <textarea
                 value={editedTranscript}
                 onChange={(e) => setEditedTranscript(e.target.value)}
-                className="w-full h-48 p-2 bg-neutral-800 text-white border border-neutral-600 rounded-md"
+                className="w-full h-48 p-2 bg-neutral-800 text-white text-sm border border-neutral-600 rounded-md"
               />
               <div className="flex justify-end mt-2">
                 <button 
@@ -139,12 +140,12 @@ const Chatbox = ({ transcript }) => {
           )
         ) : message.type === 'user' ? (
           <div>
-            <div className="font-semibold mb-1 text-sm text-blue-200">You</div>
+            <div className="font-semibold text-sm text-nuetral-900"></div>
             <p className="whitespace-pre-wrap">{message.content}</p>
           </div>
         ) : message.type === 'ai' ? (
           <div>
-            <div className="font-semibold mb-1 text-sm text-green-400">AI Assistant</div>
+            <div className="font-semibold text-[10px] text-red-400 opacity-80">ScribeLight</div>
             <p className="whitespace-pre-wrap">{message.content}</p>
           </div>
         ) : (
@@ -162,7 +163,7 @@ const Chatbox = ({ transcript }) => {
   }, [messages, loading]);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-200px)] max-h-[calc(100vh-200px)]">
+    <div className="flex flex-col h-full">
       {/* Transcript controls */}
       <div className="bg-neutral-900 p-2 border-b border-neutral-800 flex items-center flex-shrink-0">
         <button 
@@ -183,33 +184,60 @@ const Chatbox = ({ transcript }) => {
       </div>
 
       {/* Main chat area */}
-      <div className="flex-1 overflow-y-auto p-4 min-h-0" ref={chatRef}>
+      <div 
+        className="flex-1 overflow-y-auto p-4 min-h-0 scrollbar-thin scrollbar-thumb-neutral-500" 
+        ref={chatRef}
+        style={{
+          scrollbarWidth: 'thin',
+          scrollbarColor: '#4B5563 transparent'
+        }}
+      >
         {messages.map((message, index) => renderMessage(message, index))}
         {loading && (
-          <div className="flex items-center gap-2 text-neutral-400">
-            <Loader className="w-4 h-4 animate-spin" />
-            <span>AI is thinking...</span>
+          <div className="flex items-center gap-2 text-neutral-400 w-1/5">
+            <AiLoader />
           </div>
         )}
       </div>
 
-      {/* Input form */}
-      <form onSubmit={handleSubmit} className="p-4 bg-neutral-900 border-t border-neutral-800 flex-shrink-0">
-        <div className="flex gap-2">
-          <input
-            type="text"
+      {/* Input form - now positioned at the bottom */}
+      <form onSubmit={handleSubmit} className="p-4 bg-neutral-900 border-t border-neutral-800 mt-auto">
+        <div className="relative">
+          <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask a question about the video..."
-            className="flex-1 px-4 py-2 rounded-lg bg-neutral-800 text-white border border-neutral-700 focus:outline-none focus:border-blue-500"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSubmit(e);
+              }
+            }}
+            placeholder="Ask anything about the video..."
+            className="w-full px-4 py-3 h-24 rounded-xl bg-neutral-800 text-white border border-neutral-700 focus:outline-none resize-none pr-12 scrollbar-thin scrollbar-thumb-neutral-600 placeholder:text-neutral-500 placeholder:font-normal"
             disabled={loading}
+            style={{
+              scrollbarWidth: 'thin',
+              scrollbarColor: '#4B5563 transparent'
+            }}
           />
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="absolute bottom-2 right-2 p-2 mb-3 mr-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Send
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="w-5 h-5"
+            >
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
           </button>
         </div>
       </form>

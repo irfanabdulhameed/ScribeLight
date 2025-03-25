@@ -1,38 +1,6 @@
-// import { Link, NavLink } from "react-router-dom";
-// import logo from "../assets/Logored.png";
 
-// const Navbar = () => {
-//   return (
-//     <nav className="flex items-center lg:justify-between pb-8 pt-6 mx-10 pr-4">
-//       <div className="hidden flex-shrink-0 lg:flex items-center">
-//         {/* Add 'to="/" for the logo to redirect to the homepage */}
-//         <Link to="/">
-//           <img className="mx-5 my-4 w-40" src={logo} alt="Logo" />
-//         </Link>
-//       </div>
 
-//       {/* Right Side: Navigation Links */}
-//       <div className="flex items-center justify-center md:gap-20 gap-10 text-md text-neutral-200">
-//         <NavLink to="/Summarize" className="text-md">
-//           Summarize
-//         </NavLink>
-//         <NavLink to="/Faq" className="text-md">
-//           FAQ
-//         </NavLink>
-//         <NavLink to="/Contact" className="text-md">
-//           Contact
-//         </NavLink>
-//         <NavLink to="/About" className="text-md">
-//           About
-//         </NavLink>
-//       </div>
-//     </nav>
-//   );
-// };
-
-// export default Navbar;
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, NavLink } from "react-router-dom";
 import logo from "../assets/Logored.png";
 
@@ -42,6 +10,20 @@ const Navbar = () => {
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isOpen && !event.target.closest('nav') && !event.target.closest('.mobile-sidebar')) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
 
   const NavItem = ({ to, children }) => (
     <NavLink
@@ -58,7 +40,7 @@ const Navbar = () => {
   );
 
   return (
-    <nav className="flex items-center justify-between py-8 px-4 md:px-10">
+    <nav className="flex items-center justify-between py-8 px-4 md:px-10 relative z-50">
       <div className="flex-shrink-0">
         <Link to="/">
           <img className="w-32 md:w-40" src={logo} alt="Logo" />
@@ -67,7 +49,7 @@ const Navbar = () => {
 
       {/* Mobile menu button */}
       <button
-        className="md:hidden text-neutral-200 focus:outline-none"
+        className="md:hidden text-neutral-200 focus:outline-none z-50"
         onClick={toggleMenu}
       >
         <svg
@@ -95,16 +77,26 @@ const Navbar = () => {
         <NavItem to="/About">About</NavItem>
       </div>
 
-      {/* Mobile Navigation */}
-      {isOpen && (
-        <div className="absolute top-16 left-0 right-0 bg-gray-800 md:hidden">
-          <div className="flex flex-col items-center space-y-4 py-4 text-neutral-200">
-            <NavItem to="/Summarize">Summarize</NavItem>
-            <NavItem to="/Faq">FAQ</NavItem>
-            <NavItem to="/Contact">Contact</NavItem>
-            <NavItem to="/About">About</NavItem>
-          </div>
+      {/* Mobile Navigation - Sidebar */}
+      <div 
+        className={`fixed top-0 right-0 h-full w-64 bg-gray-900 shadow-lg transform transition-transform duration-300 ease-in-out z-40 md:hidden mobile-sidebar ${
+          isOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        <div className="flex flex-col items-start space-y-8 p-8 pt-24 text-neutral-200">
+          <NavItem to="/Summarize">Summarize</NavItem>
+          <NavItem to="/Faq">FAQ</NavItem>
+          <NavItem to="/Contact">Contact</NavItem>
+          <NavItem to="/About">About</NavItem>
         </div>
+      </div>
+      
+      {/* Backdrop overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 md:hidden z-30"
+          onClick={() => setIsOpen(false)}
+        />
       )}
     </nav>
   );

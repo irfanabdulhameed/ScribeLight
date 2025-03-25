@@ -5,6 +5,8 @@ import missionImg from "../assets/mission-2.svg";
 import BG from "../Component/BG"; // Importing your BG component
 import Footer from "../Component/Footer";
 import whoweare from "../assets/Whoweare-2.svg";
+import AboutMain from "../Component/MainAbout";
+
 
 const About = () => {
   return (
@@ -15,12 +17,13 @@ const About = () => {
       {/* Page Content */}
       <div className="relative z-10">
         {" "}
+        <AboutMain />
         {/* Added relative positioning with z-index to keep content above background */}
-        <div className="flex flex-col mx-10 py-10">
+        {/* <div className="flex flex-col mx-10 py-10">
           <div className="text-center text-white lg:text-6xl md:text-4xl text-2xl font-semibold pt-10 lg:pb-5 pb-1">
             About <span className="text-red-400">Us</span>
           </div>
-          <div className="lg:px-40 px-4 text-justify lg:text-center md:text-center text-sm md:text-md lg:text-xl text-white">
+          <div className="lg:px-40 px-4 text-justify lg:text-center md:text-center text-sm md:text-md lg:text-xl text-white font-light">
             <p className="text-neutral-300">
               Hey there! 👋 We’re Scribelight, your go-to tool for turning those
               long YouTube videos into easy-to-digest text and summaries. We
@@ -32,7 +35,7 @@ const About = () => {
           <div className="text-center text-white lg:text-6xl md:text-4xl text-2xl font-semibold pt-24 lg:pb-5 pb-1 mt-24 border-t border-neutral-500">
             Our <span className="text-red-400">Mission</span>
           </div>
-          <div className="lg:px-40 px-4 text-justify lg:text-center md:text-center text-sm md:text-md lg:text-xl text-white">
+          <div className="lg:px-40 px-4 text-justify lg:text-center md:text-center text-sm md:text-md lg:text-xl text-white font-light">
             <p className="text-neutral-300">
               We know you don’t have time to jump from tool to tool just to get
               the information you need. That’s why we created an all-in-one
@@ -47,7 +50,7 @@ const About = () => {
             Who <span className="text-red-400">We</span>
             <span> Are?</span>
           </div>
-          <div className="lg:px-40 px-4 text-justify lg:text-center md:text-center text-sm md:text-md lg:text-xl text-white">
+          <div className="lg:px-40 px-4 text-justify lg:text-center md:text-center text-sm md:text-md lg:text-xl text-white font-light">
             <p className="text-neutral-300">
               Who Are We? We’re five final-year students from Farook College,
               and ScribeLight is our passion project. We’re pretty new to the
@@ -57,7 +60,7 @@ const About = () => {
             </p>
             <img src={whoweare} className="w-3/5 mx-auto mt-14 pb-14" />
           </div>
-        </div>
+        </div> */}
         <Footer />
       </div>
     </div>

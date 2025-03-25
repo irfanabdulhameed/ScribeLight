@@ -1,52 +1,56 @@
-// import React from "react";
-// import Chatbox from "../Component/Chatbox";
-// import BG from "../Component/BG";
-// import Footer from "../Component/Footer";
-// import { Loader } from "lucide-react";
-// import Ytinput from "../Component/Ytinput";
-// // import ChatBox2 from "../Component/ChatBox-2";
-// // import Chatbox3 from "../Component/Chatbox-3";
-
-// const Summarize = () => {
-//   return (
-//     <div>
-//       <BG />
-//       <Ytinput />
-//       {/* <ChatBox2 /> */}
-//       <Chatbox />
-//       {/* <Chatbox3 /> */}
-//       {/* <Loader /> */}
-//       <Footer />
-//     </div>
-//   );
-// };
-
-// export default Summarize;
-
-
 import React, { useState } from "react";
 import Chatbox from "../Component/Chatbox";
 import BG from "../Component/BG";
 import Footer from "../Component/Footer";
 import Ytinput from "../Component/Ytinput";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const Summarize = () => {
   const [transcript, setTranscript] = useState(""); // State to store the transcript
+  const [sidebarOpen, setSidebarOpen] = useState(true); // State to control sidebar visibility
 
   // Callback function to receive the transcript from Ytinput
   const handleTranscriptReceived = (transcript) => {
     setTranscript(transcript);
   };
 
+  // Toggle sidebar visibility
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   return (
     <div>
-      <BG />
-      {/* Pass the callback function to Ytinput */}
-      <Ytinput onTranscriptReceived={handleTranscriptReceived} />
-      {/* Pass the transcript to Chatbox */}
-      <Chatbox transcript={transcript} />
-      <Footer />
-    </div>
+    <div className="flex h-screen bg-neutral-900 overflow-hidden">
+      {/* Sidebar with Ytinput */}
+      <div 
+        className={`bg-neutral-800 border-r border-neutral-600 transition-all duration-700 ease-in-out rounded-r-xl ${
+          sidebarOpen ? 'w-[32rem]' : 'w-0'
+        } overflow-hidden flex flex-col`}
+      >
+        <div className="p-4 flex-1 overflow-y-auto">
+          <Ytinput onTranscriptReceived={handleTranscriptReceived} />
+        </div>
+      </div>
+
+      {/* Toggle sidebar button */}
+      <button 
+        onClick={toggleSidebar}
+        className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-neutral-800 text-white p-1 rounded-r-md z-10 hover:bg-neutral-700 transition-colors"
+      >
+        {sidebarOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+      </button>
+
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col h-full overflow-hidden">
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-5xl mx-auto h-full">
+            <Chatbox transcript={transcript} />
+          </div>
+        </div>
+
+      </div>
+    </div></div>
   );
 };
 
