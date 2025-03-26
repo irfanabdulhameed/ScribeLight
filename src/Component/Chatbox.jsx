@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Loader, Eye, EyeOff, Edit } from 'lucide-react';
 import AiLoader from '../Misc/AI-Loader';
+import ReactMarkdown from 'react-markdown';
 
 const Chatbox = ({ transcript }) => {
   const [messages, setMessages] = useState([]);
@@ -146,7 +147,9 @@ const Chatbox = ({ transcript }) => {
         ) : message.type === 'ai' ? (
           <div>
             <div className="font-semibold text-[10px] text-red-400 opacity-80">ScribeLight</div>
-            <p className="whitespace-pre-wrap">{message.content}</p>
+            <div className="prose prose-invert prose-sm max-w-none">
+              <ReactMarkdown>{message.content}</ReactMarkdown>
+            </div>
           </div>
         ) : (
           <p className="whitespace-pre-wrap">{message.content}</p>
@@ -165,24 +168,6 @@ const Chatbox = ({ transcript }) => {
   return (
     <div className="flex flex-col h-full">
       {/* Transcript controls */}
-      <div className="bg-neutral-900 p-2 border-b border-neutral-800 flex items-center flex-shrink-0">
-        <button 
-          onClick={toggleTranscript}
-          className="flex items-center gap-1 px-3 py-1 bg-neutral-800 text-white rounded-md hover:bg-neutral-700 mr-2"
-        >
-          {showTranscript ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-          {showTranscript ? 'Hide Transcript' : 'Show Transcript'}
-        </button>
-        <button 
-          onClick={toggleEditTranscript}
-          className="flex items-center gap-1 px-3 py-1 bg-neutral-800 text-white rounded-md hover:bg-neutral-700"
-          disabled={isEditingTranscript}
-        >
-          <Edit className="w-4 h-4" />
-          Edit Transcript
-        </button>
-      </div>
-
       {/* Main chat area */}
       <div 
         className="flex-1 min-h-[40vh] max-h-[70vh] overflow-y-auto p-4 min-h-0 scrollbar-thin scrollbar-thumb-neutral-500" 
@@ -203,6 +188,23 @@ const Chatbox = ({ transcript }) => {
       {/* Input form - now positioned at the bottom */}
       <form onSubmit={handleSubmit} className="p-4 bg-neutral-900 border-t border-neutral-800 mt-auto">
         <div className="relative">
+          <div className="flex gap-2 mb-4">
+            <button 
+              onClick={toggleTranscript}
+              className="flex items-center gap-1 px-4 py-2 bg-neutral-800 text-xs text-white rounded-xl hover:bg-neutral-700 transition-colors transition duration-300 border-t-gray-500/50 border-l-gray-500/50 border-b-gray-800/50 border-r-gray-800/50 border"
+            >
+              {showTranscript ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+              {showTranscript ? 'Hide Transcript' : 'Show Transcript'}
+            </button>
+            <button 
+              onClick={toggleEditTranscript}
+              className="flex items-center gap-1 px-4 py-2 bg-neutral-800 text-white rounded-xl text-xs hover:bg-neutral-700 transition-colors transition duration-300 border-t-gray-500/50 border-l-gray-500/50 border-b-gray-800/50 border-r-gray-800/50 border"
+              disabled={isEditingTranscript}
+            >
+              <Edit className="w-3 h-3" />
+              Edit Transcript
+            </button>
+          </div>
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -213,7 +215,7 @@ const Chatbox = ({ transcript }) => {
               }
             }}
             placeholder="Ask anything about the video..."
-            className="w-full px-4 py-3 h-24 rounded-xl bg-neutral-800 text-white border border-neutral-700 focus:outline-none resize-none pr-12 scrollbar-thin scrollbar-thumb-neutral-600 placeholder:text-neutral-500 placeholder:font-normal"
+            className="w-full px-4 py-3 h-24 rounded-xl bg-neutral-800 text-white border border-neutral-700 focus:outline-none resize-none pr-12 scrollbar-thin scrollbar-thumb-neutral-600 placeholder:text-neutral-500 placeholder:font-normal border-t-gray-500/50 border-l-gray-500/50 border-b-gray-800/50 border-r-gray-800/50 border"
             disabled={loading}
             style={{
               scrollbarWidth: 'thin',
@@ -223,7 +225,7 @@ const Chatbox = ({ transcript }) => {
           <button
             type="submit"
             disabled={loading}
-            className="absolute bottom-2 right-2 p-2 mb-3 mr-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="absolute bottom-2 right-2 p-2 mb-3 mr-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed border-t-red-300 border-l-red-300 border-b-red-700 border-r-red-700 border transition-colors transition duration-600"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

@@ -6,7 +6,7 @@ import Aboutpart from "../Component/Aboutsection";
 
 export default function Home() {
   return (
-    <div>
+    <div className="min-h-screen bg-neutral-900">
       <BG />
       <HeroSection />
       <Horbar />

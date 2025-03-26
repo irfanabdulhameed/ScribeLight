@@ -3,7 +3,7 @@ import Chatbox from "../Component/Chatbox";
 import BG from "../Component/BG";
 import Footer from "../Component/Footer";
 import Ytinput from "../Component/Ytinput";
-import Minimap from "../Component/Minimap";
+// import Minimap from "../Component/Minimap";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const Summarize = () => {
@@ -45,15 +45,22 @@ const Summarize = () => {
 
       {/* Main content area */}
       <div className="flex-1 flex flex-col overflow-hidden h-full">
-        <div className="flex-1 overflow-y-auto pr-32" ref={chatContainerRef}>
-          <div className="max-w-5xl mx-auto h-full">
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-4xl mx-auto h-full">
             <Chatbox transcript={transcript} />
           </div>
         </div>
       </div>
 
       {/* Minimap */}
-      <Minimap containerRef={chatContainerRef} />
+      {/* <Minimap 
+        containerRef={chatContainerRef} 
+        className="z-20" 
+        style={{
+          top: "calc(4rem + 8px)", // Position from top to align with "Show Transcript" button
+          bottom: "calc(4rem + 8px)" // Position from bottom to end above prompt box
+        }}
+      /> */}
     </div></div>
   );
 };

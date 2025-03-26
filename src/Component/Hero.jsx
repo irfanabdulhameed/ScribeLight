@@ -23,19 +23,24 @@ export default function HeroSection() {
       <div className="relative container mx-auto px-4 md:px-6 flex items-center justify-center min-h-full">
         <div className="flex flex-col items-center justify-center space-y-6 md:space-y-8 text-center max-w-4xl mx-auto">
           <div className="space-y-4 md:space-y-6">
-            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl xl:text-6xl/none text-center">
-              Skip the watch!{""}
+            <h1 className="text-3xl font-medium tracking-tight sm:text-4xl md:text-5xl xl:text-6xl/none text-center font-space-grotesk">
+              <span className="bg-gradient-to-b from-white to-gray-400 text-transparent bg-clip-text">
+                Skip The Watch!{""}
+              </span>
               <span
-                className="text-red-500 px-2 md:p-6"
+                className="px-2 md:p-6 font-bold bg-gradient-to-b from-red-400 to-red-600 text-transparent bg-clip-text"
                 style={{
-                  textShadow: "0 0 50px rgba(255, 62, 62, 0.8)",
+                  textShadow: "0 0 15px rgba(255, 62, 62, 0.3)",
                 }}
               >
                 Summarize
               </span>
-              <br className="md:block" /> Youtube videos in seconds.
+              <br className="md:block" />
+              <span className="bg-gradient-to-b from-white to-gray-400 text-transparent bg-clip-text">
+                Youtube Videos in Seconds.
+              </span>
             </h1>
-            <p className="max-w-[600px] text-zinc-200 text-sm md:text-base lg:text-xl mx-auto font-light text-center px-4">
+            <p className="max-w-[600px] text-white text-sm md:text-base lg:text-lg mx-auto font-light text-center ">
               Discover how our innovative idea can transform your work and boost
               your productivity.
             </p>

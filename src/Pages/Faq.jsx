@@ -34,8 +34,8 @@ const faqData = [
 ];
 
 const FAQItem = ({ question, answer, isOpen, onClick }) => {
-  return (
-    <div className="relative z-10 border rounded-lg overflow-hidden mb-4">
+    return (
+    <div className="relative z-10 border border-neutral-700 rounded-lg overflow-hidden mb-4">
       <button
         className="w-full flex justify-between items-center p-4 text-left focus:outline-none bg-zinc-900"
         onClick={onClick}
@@ -78,23 +78,25 @@ const FAQPage = () => {
   );
 
   return (
-    <div className="relative z-10">
-      {/* Add the background component here */}
-      <BG className="absolute top-0 left-0 w-full h-full -z-10 pointer-events-none" />
+    <div className="bg-neutral-900 min-h-screen relative">
+      {/* Background component with proper positioning */}
+      <BG className="fixed inset-0 w-full h-full -z-10" />
 
       <div className="min-h-screen p-4 md:p-8 lg:p-12 relative z-10">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-3xl md:text-4xl font-bold text-center mb-8 text-white pt-10">
+          <h1 className="text-3xl md:text-4xl font-bold text-center mb-8 text-white pt-10 font-space-grotesk">
             Frequently Asked Questions
           </h1>
 
-          <input
-            type="text"
-            placeholder="Search FAQ..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full mx-auto p-2 mb-8 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-300"
-          />
+          <div className="relative mb-8">
+            <input
+              type="text"
+              placeholder="Search FAQ..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full mx-auto p-3 pl-4 border border-neutral-700 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-neutral-800 text-white"
+            />
+          </div>
 
           <div>
             {filteredFAQ.map((item, index) => (
@@ -112,7 +114,7 @@ const FAQPage = () => {
             <div>
               <p className="text-center font-thin text-white mt-8">
                 Oops! . . . Seems you have other questions beyond our FAQ!
-                <img src={searchImg} className="mx-auto" alt="Search" />
+                <img src={searchImg} className="mx-auto mt-4" alt="Search" />
               </p>
             </div>
           )}

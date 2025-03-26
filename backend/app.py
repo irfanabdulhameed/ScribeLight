@@ -1,4 +1,5 @@
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, jsonify, make_response, Response
+import json
 from flask_cors import CORS
 from google import genai
 from google.genai import types
@@ -99,6 +100,14 @@ def process_text():
         Answer in a structured manner with clear headings and bullet points where appropriate.
         Use formatting to highlight key information.
         Organize your response with numbered lists for sequential information.
+        Avoid using vague or generic responses.
+        Avoid using phrases like "I'm not sure" or "I don't know".
+        Avoid using phrases like "I'm not sure" or "I don't know".
+        If User asks anything outside the scope of the video, answer in a structured manner with clear headings and bullet points where appropriate but inform them that asked question is not related to video.
+        Every response must be connected to each other in a coherent and logical fashion.
+        All responses must contains at least 5 sentences.
+        provide personal opinion and experience when asked.
+        Be very friendly, informal and funny
         """
         
         # Set up the content and configuration
