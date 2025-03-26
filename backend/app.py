@@ -89,6 +89,16 @@ def process_text():
 
         Provide a concise and accurate response based on the transcript.
         If the answer is not in the transcript, say so.
+        If the question is not directly addressed in the video transcript, acknowledge this and provide:
+        1. A clear statement that the specific topic wasn't covered in the video
+        2. A relevant, informative response based on general knowledge
+        3. A smooth transition connecting this response to the video's context
+        Maintain continuity in the conversation flow and ensure all responses are coherent and interconnected.
+        Be very helpful and informative.
+        Be very concise.
+        Answer in a structured manner with clear headings and bullet points where appropriate.
+        Use formatting to highlight key information.
+        Organize your response with numbered lists for sequential information.
         """
         
         # Set up the content and configuration

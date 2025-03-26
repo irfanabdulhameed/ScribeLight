@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 
-const Minimap = ({ content, selection, visibleLines }) => {
+const Minimapp = ({ content, selection, visibleLines }) => {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
@@ -96,4 +96,4 @@ const Minimap = ({ content, selection, visibleLines }) => {
   );
 };
 
-export default Minimap;
+export default Minimapp;

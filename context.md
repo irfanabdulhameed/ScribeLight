@@ -1,4 +1,4 @@
-### **ScribeLight: AI-Powered YouTube Video Chat Tool**  
+<!-- ### **ScribeLight: AI-Powered YouTube Video Chat Tool**  
 
 #### **Project Description**  
 
@@ -46,4 +46,6 @@ Built with **React.js for the frontend** and **Flask for the backend**, ScribeLi
 💼 **Professionals & Analysts** – Summarize webinars, meetings, and business discussions.  
 🎙 **Content Creators & Journalists** – Quickly obtain key points from interviews and reports.  
 
-ScribeLight is an essential tool for anyone who wants to **interact with video content in a smarter, more efficient way**—eliminating the need to watch lengthy videos while improving accessibility and comprehension. 🚀
+ScribeLight is an essential tool for anyone who wants to **interact with video content in a smarter, more efficient way**—eliminating the need to watch lengthy videos while improving accessibility and comprehension. 🚀 -->
+
+

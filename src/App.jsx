@@ -12,7 +12,7 @@ import Summarize from "./Pages/Summarize";
 const App = () => {
   return (
     <Router>
-      <div className="relative bg-scroll min-h-screen bg-neutral-900">
+      <div className="relative h-screen bg-neutral-900">
         <Navbar />
         <div>
           <Routes>

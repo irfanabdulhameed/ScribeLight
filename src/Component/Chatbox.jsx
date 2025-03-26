@@ -92,7 +92,7 @@ const Chatbox = ({ transcript }) => {
         key={index}
         className={`p-4  mb-4 ${
           message.type === 'user'
-            ? 'bg-neutral-900 border border-gray-600 ml-auto max-w-[80%] text-white text-sm rounded-xl'
+            ? 'bg-[#292929] ml-auto max-w-[80%] text-white text-sm rounded-2xl'
             : message.type === 'ai'
             ? 'bg-nuetral-900 mr-auto max-w-[80%]  text-white text-sm'
             : message.type === 'transcript'
@@ -185,7 +185,7 @@ const Chatbox = ({ transcript }) => {
 
       {/* Main chat area */}
       <div 
-        className="flex-1 overflow-y-auto p-4 min-h-0 scrollbar-thin scrollbar-thumb-neutral-500" 
+        className="flex-1 min-h-[40vh] max-h-[70vh] overflow-y-auto p-4 min-h-0 scrollbar-thin scrollbar-thumb-neutral-500" 
         ref={chatRef}
         style={{
           scrollbarWidth: 'thin',

@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Chatbox from "../Component/Chatbox";
 import BG from "../Component/BG";
 import Footer from "../Component/Footer";
 import Ytinput from "../Component/Ytinput";
+import Minimap from "../Component/Minimap";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const Summarize = () => {
   const [transcript, setTranscript] = useState(""); // State to store the transcript
   const [sidebarOpen, setSidebarOpen] = useState(true); // State to control sidebar visibility
+  const chatContainerRef = useRef(null);
 
   // Callback function to receive the transcript from Ytinput
   const handleTranscriptReceived = (transcript) => {
@@ -21,7 +23,7 @@ const Summarize = () => {
 
   return (
     <div>
-    <div className="flex h-screen bg-neutral-900 overflow-hidden">
+    <div className="flex min-h-[calc(90vh-50px)] bg-neutral-900 overflow-hidden">
       {/* Sidebar with Ytinput */}
       <div 
         className={`bg-neutral-800 border-r border-neutral-600 transition-all duration-700 ease-in-out rounded-r-xl ${
@@ -42,14 +44,16 @@ const Summarize = () => {
       </button>
 
       {/* Main content area */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden">
-        <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 flex flex-col overflow-hidden h-full">
+        <div className="flex-1 overflow-y-auto pr-32" ref={chatContainerRef}>
           <div className="max-w-5xl mx-auto h-full">
             <Chatbox transcript={transcript} />
           </div>
         </div>
-
       </div>
+
+      {/* Minimap */}
+      <Minimap containerRef={chatContainerRef} />
     </div></div>
   );
 };
