@@ -59,19 +59,19 @@ const Ytinput = ({ onTranscriptReceived }) => {
   return (
     <div className="w-full max-w-2xl mx-auto p-4">
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex gap-2">
+        <div className="flex gap-2 transition transition all duration-700">
           <input
             type="text"
             value={url}
             onChange={handleUrlChange}
             placeholder="Enter YouTube URL"
-            className="flex-1 px-4 py-2 rounded-lg bg-neutral-800 text-white text-sm border border-neutral-700 font-normal focus:outline-none focus:border-red-500 focus:border-1"
+            className="flex-1 px-4 py-2 rounded-xl bg-neutral-900 text-white text-sm border border-neutral-700 font-normal outline-none border-t-gray-500/50 border-l-gray-500/50 border-b-gray-800/50 border-r-gray-800/50 border"
             required
           />
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2 bg-[linear-gradient(to_right,#ef4444,#b91c1c)] hover:bg-[linear-gradient(to_right,#dc2626,#991b1b)] text-white rounded-lg transition-all duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-4 py-1 bg-[linear-gradient(to_right,#ef4444,#b91c1c)] hover:bg-[linear-gradient(to_right,#dc2626,#991b1b)] text-white rounded-xl transition-all duration-700 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border-t-red-300 border-l-red-300 border-b-red-700 border-r-red-700 border"
           >
             {loading ? (
               <>

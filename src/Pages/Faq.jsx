@@ -35,9 +35,9 @@ const faqData = [
 
 const FAQItem = ({ question, answer, isOpen, onClick }) => {
     return (
-    <div className="relative z-10 border border-neutral-700 rounded-lg overflow-hidden mb-4">
+    <div className="relative z-10 border border-neutral-700 rounded-2xl overflow-hidden mb-4">
       <button
-        className="w-full flex justify-between items-center p-4 text-left focus:outline-none bg-zinc-900"
+        className="w-full flex justify-between items-center p-4 text-left focus:outline-none bg-zinc-900 border-t-gray-500/50 border-l-gray-500/50 border-b-gray-800/10 border-r-gray-800/10 border"
         onClick={onClick}
       >
         <span className="font-medium text-white">{question}</span>
@@ -48,11 +48,11 @@ const FAQItem = ({ question, answer, isOpen, onClick }) => {
         )}
       </button>
       <div
-        className={`overflow-hidden transition-all duration-500 ease-in-out ${
+        className={`overflow-hidden transition-all transition duration-700  ${
           isOpen ? "max-h-96" : "max-h-0"
         }`}
       >
-        <div className="p-4 bg-gradient-to-r text-sm from-[#f13a3a5f] to-[#470000] text-gray-200 font-light">
+        <div className="p-4 bg-zinc-900 text-sm text-white/50 font-normal">
           <p>{answer}</p>
         </div>
       </div>
@@ -94,7 +94,7 @@ const FAQPage = () => {
               placeholder="Search FAQ..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full mx-auto p-3 pl-4 border border-neutral-700 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-neutral-800 text-white"
+              className="w-full mx-auto p-3 pl-4 rounded-2xl focus:outline-none bg-neutral-800 text-white border-t-gray-500/50 border-l-gray-500/50 border-b-gray-800/50 border-r-gray-800/50 border shadow-[inset_2px_2px_2px_rgba(0,0,0,0.3)]"
             />
           </div>
 

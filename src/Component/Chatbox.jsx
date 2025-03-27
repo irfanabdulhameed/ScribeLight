@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Loader, Eye, EyeOff, Edit } from 'lucide-react';
+// Add Copy icon to imports
+import { Loader, Eye, EyeOff, Edit, Copy, Check } from 'lucide-react';
 import AiLoader from '../Misc/AI-Loader';
 import ReactMarkdown from 'react-markdown';
 
@@ -24,11 +25,18 @@ const Chatbox = ({ transcript }) => {
     e.preventDefault();
     if (!input.trim()) return;
 
-    setLoading(true);
+    // Add user message to chat
     setMessages(prev => [...prev, { type: 'user', content: input }]);
+    
+    // Create a temporary message for the AI response that will be updated
+    const tempAiMessageId = Date.now();
+    setMessages(prev => [...prev, { type: 'ai', id: tempAiMessageId, content: '' }]);
+    
+    setLoading(true);
     setInput('');
-
+  
     try {
+      // Make a fetch request to the streaming endpoint
       const response = await fetch('http://127.0.0.1:5000/api/process-text', {
         method: 'POST',
         headers: {
@@ -36,19 +44,73 @@ const Chatbox = ({ transcript }) => {
         },
         body: JSON.stringify({
           text: input,
-          transcript,
+          transcript: editedTranscript || transcript,
         }),
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to process text');
+  
+      // Create a reader from the response body stream
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      
+      // Read the stream
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        // Decode the chunk and process it
+        const chunk = decoder.decode(value, { stream: true });
+        
+        // Process the SSE data
+        const lines = chunk.split('\n\n');
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const jsonData = JSON.parse(line.substring(6));
+              
+              if (jsonData.chunk) {
+                // Update the AI message with the new chunk
+                setMessages(prev => 
+                  prev.map(msg => 
+                    msg.id === tempAiMessageId 
+                      ? { ...msg, content: msg.content + jsonData.chunk } 
+                      : msg
+                  )
+                );
+              }
+              
+              if (jsonData.done) {
+                // Stream is complete
+                break;
+              }
+              
+              if (jsonData.error) {
+                console.error('Error from server:', jsonData.error);
+                // Update the AI message with the error
+                setMessages(prev => 
+                  prev.map(msg => 
+                    msg.id === tempAiMessageId 
+                      ? { ...msg, content: 'Error: ' + jsonData.error } 
+                      : msg
+                  )
+                );
+                break;
+              }
+            } catch (error) {
+              console.error('Error parsing SSE data:', error);
+            }
+          }
+        }
       }
-
-      setMessages(prev => [...prev, { type: 'ai', content: data.processed_text }]);
     } catch (error) {
-      setMessages(prev => [...prev, { type: 'error', content: error.message }]);
+      console.error('Error:', error);
+      // Update the AI message with the error
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === tempAiMessageId 
+            ? { ...msg, content: 'Error: ' + error.message } 
+            : msg
+        )
+      );
     } finally {
       setLoading(false);
     }
@@ -81,26 +143,62 @@ const Chatbox = ({ transcript }) => {
     setIsEditingTranscript(false);
   };
 
+  // Add state to track which message has been copied
+  const [copiedMessageId, setCopiedMessageId] = useState(null);
+  
+  // Add function to handle copying text to clipboard
+  const handleCopyToClipboard = (text, messageId) => {
+    navigator.clipboard.writeText(text).then(() => {
+      // Set the copied message ID to show the check icon
+      setCopiedMessageId(messageId);
+      
+      // Reset the copied state after 2 seconds
+      setTimeout(() => {
+        setCopiedMessageId(null);
+      }, 2000);
+    }).catch(err => {
+      console.error('Failed to copy text: ', err);
+    });
+  };
+
   const renderMessage = (message, index) => {
     if (message.type === 'transcript' && !showTranscript) {
       return null;
     }
 
     const isHighlighted = highlightedText && message.content.includes(highlightedText);
+    const messageId = message.id || `message-${index}`;
+    // Check if this is a completed AI message
+    const isCompletedAiMessage = message.type === 'ai' && message.content;
 
     return (
       <div
         key={index}
-        className={`p-4  mb-4 ${
+        className={`p-4 mb-4 relative group ${
           message.type === 'user'
             ? 'bg-[#292929] ml-auto max-w-[80%] text-white text-sm rounded-2xl'
             : message.type === 'ai'
-            ? 'bg-nuetral-900 mr-auto max-w-[80%]  text-white text-sm'
+            ? 'bg-nuetral-900 mr-auto max-w-[80%] text-white text-sm pb-8 mb-10'
             : message.type === 'transcript'
             ? 'bg-neutral-700 w-full'
             : 'bg-red-600 text-white'
         }`}
       >
+        {/* Copy button for AI responses - visible only on hover */}
+        {isCompletedAiMessage && (
+          <button
+            onClick={() => handleCopyToClipboard(message.content, messageId)}
+            className="absolute left-4 bottom-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1 text-xs text-neutral-400 hover:text-white bg-neutral-800/70 p-2 rounded-md"
+            title="Copy to clipboard"
+          >
+            {copiedMessageId === messageId ? (
+              <Check className="w-3 h-3" />
+            ) : (
+              <Copy className="w-3 h-3" />
+            )}
+          </button>
+        )}
+        
         {message.type === 'transcript' ? (
           isEditingTranscript ? (
             <div className="w-full">

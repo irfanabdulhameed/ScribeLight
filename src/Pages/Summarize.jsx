@@ -29,8 +29,18 @@ const Summarize = () => {
         className={`bg-neutral-800 border-r border-neutral-600 transition-all duration-700 ease-in-out rounded-r-xl ${
           sidebarOpen ? 'w-[32rem]' : 'w-0'
         } overflow-hidden flex flex-col`}
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        <div className="p-4 flex-1 overflow-y-auto">
+        <div 
+          className="p-4 flex-1 overflow-y-auto"
+          style={{ 
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            '&::-webkit-scrollbar': {
+              display: 'none'
+            }
+          }}
+        >
           <Ytinput onTranscriptReceived={handleTranscriptReceived} />
         </div>
       </div>

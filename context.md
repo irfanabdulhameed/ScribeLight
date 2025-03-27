@@ -49,3 +49,4 @@ Built with **React.js for the frontend** and **Flask for the backend**, ScribeLi
 ScribeLight is an essential tool for anyone who wants to **interact with video content in a smarter, more efficient way**—eliminating the need to watch lengthy videos while improving accessibility and comprehension. 🚀 -->
 
 
+Add a small copy button under every response's left side which can copy the response to clipboard. the button must only be visible when hovering over the response.
