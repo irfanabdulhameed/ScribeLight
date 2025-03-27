@@ -17,12 +17,17 @@ const Chatbox = ({ transcript }) => {
   
   // Add state to track which message has been copied
   const [copiedMessageId, setCopiedMessageId] = useState(null);
-
+  
+  // Add a new state to track if the initial heading should be shown
+  const [showInitialHeading, setShowInitialHeading] = useState(true);
+  
   useEffect(() => {
     if (transcript) {
       setMessages([{ type: 'transcript', content: transcript }, { type: 'ai', content: 'Transcript has been updated'}]);
       setEditedTranscript(transcript);
-      setHasTranscript(true); // Set to true when transcript is available
+      setHasTranscript(true);
+      // Hide the initial heading when transcript is available
+      setShowInitialHeading(false);
     }
   }, [transcript]);
 
@@ -282,13 +287,16 @@ const Chatbox = ({ transcript }) => {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Main chat area */}
+      {/* Initial heading - shown only when no transcript is available */}
+
+      
+      {/* Main chat area - visible but with reduced opacity when initial heading is shown */}
       <div 
-        className="flex-1 min-h-[40vh] max-h-[70vh] overflow-y-auto p-4 min-h-0 scrollbar-thin scrollbar-thumb-neutral-500" 
+        className={`flex-1 min-h-[20vh] max-h-[70vh] overflow-y-auto p-4 min-h-0 scrollbar-thin scrollbar-thumb-neutral-500 ${showInitialHeading && !hasTranscript ? 'opacity-20' : 'opacity-100'}`} 
         ref={chatRef}
         style={{
           scrollbarWidth: 'thin',
-          scrollbarColor: '#262626 transparent'
+          scrollbarColor: '#272727 transparent'
         }}
       >
         {messages.map((message, index) => renderMessage(message, index))}
@@ -298,9 +306,18 @@ const Chatbox = ({ transcript }) => {
           </div>
         )}
       </div>
-
       {/* Input form - now positioned at the bottom */}
-      <form onSubmit={handleSubmit} className="p-4 bg-neutral-900 border-neutral-800 mt-auto">
+      <div>
+      {showInitialHeading && !hasTranscript && (
+        <div className="flex flex-col items-center justify-center h-full ">
+          <h2 className="text-6xl font-semibold text-center text-white font-space-grotesk">
+            Everything is Cooked here!<br />
+            Enter your Link
+          </h2>
+          <p className='text-white/50 pt-2 mb-10'>Use Scribe<span className='text-red-400/50'>Light</span> and en<span className='text-red-400/50'>Lighten</span> yourself</p>
+        </div>
+      )}
+      <form onSubmit={handleSubmit} className="p-4 bg-neutral-900  border-neutral-800 mt-auto">
         <div className="relative">
           {/* Only show transcript controls if transcript exists */}
           {hasTranscript && (
@@ -361,6 +378,7 @@ const Chatbox = ({ transcript }) => {
           </button>
         </div>
       </form>
+      </div>
     </div>
   );
 };
