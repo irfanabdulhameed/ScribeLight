@@ -12,19 +12,26 @@ const Chatbox = ({ transcript }) => {
   const [showTranscript, setShowTranscript] = useState(false);
   const [isEditingTranscript, setIsEditingTranscript] = useState(false);
   const [editedTranscript, setEditedTranscript] = useState('');
+  const [hasTranscript, setHasTranscript] = useState(false); // Add this state to track if transcript exists
   const chatRef = useRef(null);
+  
+  // Add state to track which message has been copied
+  const [copiedMessageId, setCopiedMessageId] = useState(null);
 
   useEffect(() => {
     if (transcript) {
       setMessages([{ type: 'transcript', content: transcript }, { type: 'ai', content: 'Transcript has been updated'}]);
       setEditedTranscript(transcript);
+      setHasTranscript(true); // Set to true when transcript is available
     }
   }, [transcript]);
 
+  // In the handleSubmit function, modify the streaming logic
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
-
+  
     // Add user message to chat
     setMessages(prev => [...prev, { type: 'user', content: input }]);
     
@@ -53,6 +60,8 @@ const Chatbox = ({ transcript }) => {
       const decoder = new TextDecoder();
       
       // Read the stream
+      let responseStarted = false;
+      
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -68,6 +77,12 @@ const Chatbox = ({ transcript }) => {
               const jsonData = JSON.parse(line.substring(6));
               
               if (jsonData.chunk) {
+                // If this is the first chunk, hide the loader
+                if (!responseStarted) {
+                  responseStarted = true;
+                  setLoading(false);
+                }
+                
                 // Update the AI message with the new chunk
                 setMessages(prev => 
                   prev.map(msg => 
@@ -112,6 +127,7 @@ const Chatbox = ({ transcript }) => {
         )
       );
     } finally {
+      // Ensure loading is set to false in all cases
       setLoading(false);
     }
   };
@@ -143,10 +159,10 @@ const Chatbox = ({ transcript }) => {
     setIsEditingTranscript(false);
   };
 
-  // Add state to track which message has been copied
-  const [copiedMessageId, setCopiedMessageId] = useState(null);
+  // Remove this duplicate declaration
+  // const [copiedMessageId, setCopiedMessageId] = useState(null);
   
-  // Add function to handle copying text to clipboard
+  // Keep the function
   const handleCopyToClipboard = (text, messageId) => {
     navigator.clipboard.writeText(text).then(() => {
       // Set the copied message ID to show the check icon
@@ -178,7 +194,7 @@ const Chatbox = ({ transcript }) => {
           message.type === 'user'
             ? 'bg-[#292929] ml-auto max-w-[80%] text-white text-sm rounded-2xl'
             : message.type === 'ai'
-            ? 'bg-nuetral-900 mr-auto max-w-[80%] text-white text-sm pb-8 mb-10'
+            ? 'bg-nuetral-900 mr-auto max-w-[80%] text-white text-sm  mb-10'
             : message.type === 'transcript'
             ? 'bg-neutral-700 w-full'
             : 'bg-red-600 text-white'
@@ -186,9 +202,10 @@ const Chatbox = ({ transcript }) => {
       >
         {/* Copy button for AI responses - visible only on hover */}
         {isCompletedAiMessage && (
+      
           <button
             onClick={() => handleCopyToClipboard(message.content, messageId)}
-            className="absolute left-4 bottom-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1 text-xs text-neutral-400 hover:text-white bg-neutral-800/70 p-2 rounded-md"
+            className="absolute left-4 -bottom-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1 text-xs text-neutral-400 hover:text-white bg-neutral-800/70 p-2 rounded-md"
             title="Copy to clipboard"
           >
             {copiedMessageId === messageId ? (
@@ -265,14 +282,13 @@ const Chatbox = ({ transcript }) => {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Transcript controls */}
       {/* Main chat area */}
       <div 
         className="flex-1 min-h-[40vh] max-h-[70vh] overflow-y-auto p-4 min-h-0 scrollbar-thin scrollbar-thumb-neutral-500" 
         ref={chatRef}
         style={{
           scrollbarWidth: 'thin',
-          scrollbarColor: '#4B5563 transparent'
+          scrollbarColor: '#262626 transparent'
         }}
       >
         {messages.map((message, index) => renderMessage(message, index))}
@@ -284,25 +300,29 @@ const Chatbox = ({ transcript }) => {
       </div>
 
       {/* Input form - now positioned at the bottom */}
-      <form onSubmit={handleSubmit} className="p-4 bg-neutral-900 border-t border-neutral-800 mt-auto">
+      <form onSubmit={handleSubmit} className="p-4 bg-neutral-900 border-neutral-800 mt-auto">
         <div className="relative">
-          <div className="flex gap-2 mb-4">
-            <button 
-              onClick={toggleTranscript}
-              className="flex items-center gap-1 px-4 py-2 bg-neutral-800 text-xs text-white rounded-xl hover:bg-neutral-700 transition-colors transition duration-300 border-t-gray-500/50 border-l-gray-500/50 border-b-gray-800/50 border-r-gray-800/50 border"
-            >
-              {showTranscript ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-              {showTranscript ? 'Hide Transcript' : 'Show Transcript'}
-            </button>
-            <button 
-              onClick={toggleEditTranscript}
-              className="flex items-center gap-1 px-4 py-2 bg-neutral-800 text-white rounded-xl text-xs hover:bg-neutral-700 transition-colors transition duration-300 border-t-gray-500/50 border-l-gray-500/50 border-b-gray-800/50 border-r-gray-800/50 border"
-              disabled={isEditingTranscript}
-            >
-              <Edit className="w-3 h-3" />
-              Edit Transcript
-            </button>
-          </div>
+          {/* Only show transcript controls if transcript exists */}
+          {hasTranscript && (
+            <div className="flex gap-2 mb-4">
+              <button 
+                onClick={toggleTranscript}
+                className="flex items-center gap-1 px-4 py-2 bg-neutral-800 text-xs text-white rounded-xl hover:bg-neutral-700 transition-colors transition duration-300 border-t-gray-500/50 border-l-gray-500/50 border-b-gray-800/50 border-r-gray-800/50 border"
+              >
+                {showTranscript ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                {showTranscript ? 'Hide Transcript' : 'Show Transcript'}
+              </button>
+              <button 
+                onClick={toggleEditTranscript}
+                className="flex items-center gap-1 px-4 py-2 bg-neutral-800 text-white rounded-xl text-xs hover:bg-neutral-700 transition-colors transition duration-300 border-t-gray-500/50 border-l-gray-500/50 border-b-gray-800/50 border-r-gray-800/50 border"
+                disabled={isEditingTranscript}
+              >
+                <Edit className="w-3 h-3" />
+                Edit Transcript
+              </button>
+            </div>
+          )}
+          
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -312,17 +332,17 @@ const Chatbox = ({ transcript }) => {
                 handleSubmit(e);
               }
             }}
-            placeholder="Ask anything about the video..."
+            placeholder={hasTranscript ? "Ask anything about the video..." : "Waiting for transcript..."}
             className="w-full px-4 py-3 h-24 rounded-xl bg-neutral-800 text-white border border-neutral-700 focus:outline-none resize-none pr-12 scrollbar-thin scrollbar-thumb-neutral-600 placeholder:text-neutral-500 placeholder:font-normal border-t-gray-500/50 border-l-gray-500/50 border-b-gray-800/50 border-r-gray-800/50 border"
-            disabled={loading}
+            disabled={loading || !hasTranscript}
             style={{
               scrollbarWidth: 'thin',
-              scrollbarColor: '#4B5563 transparent'
+              scrollbarColor: '#171717 transparent'
             }}
           />
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !hasTranscript}
             className="absolute bottom-2 right-2 p-2 mb-3 mr-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed border-t-red-300 border-l-red-300 border-b-red-700 border-r-red-700 border transition-colors transition duration-600"
           >
             <svg
