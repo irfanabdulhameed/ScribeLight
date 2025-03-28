@@ -324,14 +324,14 @@ const Chatbox = ({ transcript }) => {
             <div className="flex gap-2 mb-4">
               <button 
                 onClick={toggleTranscript}
-                className="flex items-center gap-1 px-4 py-2 bg-neutral-800 text-xs text-white rounded-xl hover:bg-neutral-700 transition-colors transition duration-300 border-t-gray-500/50 border-l-gray-500/50 border-b-gray-800/50 border-r-gray-800/50 border"
+                className="flex items-center gap-1 px-4 py-2 bg-neutral-800 text-xs text-white rounded-[14px] hover:bg-neutral-700 transition-colors transition duration-300 border-t-gray-500/50 border-l-gray-500/50 border-b-gray-800/50 border-r-gray-800/50 border"
               >
                 {showTranscript ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
                 {showTranscript ? 'Hide Transcript' : 'Show Transcript'}
               </button>
               <button 
                 onClick={toggleEditTranscript}
-                className="flex items-center gap-1 px-4 py-2 bg-neutral-800 text-white rounded-xl text-xs hover:bg-neutral-700 transition-colors transition duration-300 border-t-gray-500/50 border-l-gray-500/50 border-b-gray-800/50 border-r-gray-800/50 border"
+                className="flex items-center gap-1 px-4 py-2 bg-neutral-800 text-white rounded-[14px] text-xs hover:bg-neutral-700 transition-colors transition duration-300 border-t-gray-500/50 border-l-gray-500/50 border-b-gray-800/50 border-r-gray-800/50 border"
                 disabled={isEditingTranscript}
               >
                 <Edit className="w-3 h-3" />
@@ -350,17 +350,17 @@ const Chatbox = ({ transcript }) => {
               }
             }}
             placeholder={hasTranscript ? "Ask anything about the video..." : "Waiting for transcript..."}
-            className="w-full px-4 py-3 h-24 rounded-xl bg-neutral-800 text-white border border-neutral-700 focus:outline-none resize-none pr-12 scrollbar-thin scrollbar-thumb-neutral-600 placeholder:text-neutral-500 placeholder:font-normal border-t-gray-500/50 border-l-gray-500/50 border-b-gray-800/50 border-r-gray-800/50 border"
+            className="w-full px-4 py-3 h-24 rounded-[20px] bg-neutral-800 text-white border border-neutral-700 focus:outline-none resize-none pr-12 scrollbar-thin scrollbar-thumb-neutral-600 placeholder:text-neutral-500 placeholder:font-normal border-t-gray-500/50 border-l-gray-500/50 border-b-gray-800/50 border-r-gray-800/50 border"
             disabled={loading || !hasTranscript}
             style={{
               scrollbarWidth: 'thin',
-              scrollbarColor: '#171717 transparent'
+              scrollbarColor: '#3d3d3d transparent'
             }}
           />
           <button
             type="submit"
             disabled={loading || !hasTranscript}
-            className="absolute bottom-2 right-2 p-2 mb-3 mr-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed border-t-red-300 border-l-red-300 border-b-red-700 border-r-red-700 border transition-colors transition duration-600"
+            className="absolute bottom-2 right-2 p-2 mb-2 mr-1 bg-red-600 text-white rounded-2xl hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed border-t-red-300 border-l-red-300 border-b-red-700 border-r-red-700 border transition-colors transition duration-600"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

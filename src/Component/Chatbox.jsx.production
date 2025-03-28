@@ -1,0 +1,306 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { Loader, Eye, EyeOff, Edit, Copy, Check } from 'lucide-react';
+import AiLoader from '../Misc/AI-Loader';
+import ReactMarkdown from 'react-markdown';
+import { processText } from '../utils/api';
+
+const Chatbox = ({ transcript }) => {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [highlightedText, setHighlightedText] = useState('');
+  const [showTranscript, setShowTranscript] = useState(false);
+  const [isEditingTranscript, setIsEditingTranscript] = useState(false);
+  const [editedTranscript, setEditedTranscript] = useState('');
+  const [hasTranscript, setHasTranscript] = useState(false); // Add this state to track if transcript exists
+  const chatRef = useRef(null);
+  
+  // Add state to track which message has been copied
+  const [copiedMessageId, setCopiedMessageId] = useState(null);
+  
+  // Add a new state to track if the initial heading should be shown
+  const [showInitialHeading, setShowInitialHeading] = useState(true);
+  
+  useEffect(() => {
+    if (transcript) {
+      setMessages([{ type: 'transcript', content: transcript }, { type: 'ai', content: 'Transcript has been updated'}]);
+      setEditedTranscript(transcript);
+      setHasTranscript(true);
+      // Hide the initial heading when transcript is available
+      setShowInitialHeading(false);
+    }
+  }, [transcript]);
+
+  // In the handleSubmit function, modify the streaming logic
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+  
+    // Add user message to chat
+    setMessages(prev => [...prev, { type: 'user', content: input }]);
+    
+    // Create a temporary message for the AI response that will be updated
+    const tempAiMessageId = Date.now();
+    setMessages(prev => [...prev, { type: 'ai', id: tempAiMessageId, content: '' }]);
+    
+    setLoading(true);
+    setInput('');
+  
+    try {
+      // Use the API utility function instead of direct fetch
+      const response = await processText(input, editedTranscript || transcript);
+  
+      // Create a reader from the response body stream
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      
+      // Read the stream
+      let responseStarted = false;
+      
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        // Decode the chunk and process it
+        const chunk = decoder.decode(value, { stream: true });
+        
+        // Process the SSE data
+        const lines = chunk.split('\n\n');
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const jsonData = JSON.parse(line.substring(6));
+              
+              if (jsonData.chunk) {
+                // If this is the first chunk, hide the loader
+                if (!responseStarted) {
+                  responseStarted = true;
+                  setLoading(false);
+                }
+                
+                // Update the AI message with the new chunk
+                setMessages(prev => 
+                  prev.map(msg => 
+                    msg.id === tempAiMessageId 
+                      ? { ...msg, content: msg.content + jsonData.chunk } 
+                      : msg
+                  )
+                );
+              }
+              
+              if (jsonData.done) {
+                // Stream is complete
+                break;
+              }
+              
+              if (jsonData.error) {
+                console.error('Error from server:', jsonData.error);
+                setMessages(prev => 
+                  prev.map(msg => 
+                    msg.id === tempAiMessageId 
+                      ? { ...msg, content: 'Error: ' + jsonData.error } 
+                      : msg
+                  )
+                );
+                setLoading(false);
+                break;
+              }
+            } catch (e) {
+              console.error('Error parsing SSE data:', e);
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error processing text:', error);
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === tempAiMessageId 
+            ? { ...msg, content: 'Error: Failed to process your request. Please try again.' } 
+            : msg
+        )
+      );
+      setLoading(false);
+    }
+  };
+
+  // Function to toggle transcript visibility
+  const toggleTranscript = () => {
+    setShowTranscript(!showTranscript);
+  };
+
+  // Function to toggle transcript editing mode
+  const toggleEditTranscript = () => {
+    setIsEditingTranscript(!isEditingTranscript);
+  };
+
+  // Function to save edited transcript
+  const saveEditedTranscript = () => {
+    setIsEditingTranscript(false);
+    // You might want to add validation or processing here
+  };
+
+  // Function to handle transcript changes
+  const handleTranscriptChange = (e) => {
+    setEditedTranscript(e.target.value);
+  };
+
+  // Function to copy message content
+  const copyMessageContent = (content, messageId) => {
+    navigator.clipboard.writeText(content);
+    setCopiedMessageId(messageId);
+    
+    // Reset the copied state after 2 seconds
+    setTimeout(() => {
+      setCopiedMessageId(null);
+    }, 2000);
+  };
+
+  return (
+    <div className="flex flex-col h-full p-4 bg-neutral-900 text-white">
+      {/* Header with transcript toggle button */}
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">ScribeLight Chat</h2>
+        {hasTranscript && (
+          <button 
+            onClick={toggleTranscript}
+            className="flex items-center gap-1 px-3 py-1 bg-neutral-800 hover:bg-neutral-700 rounded-md text-sm transition-colors"
+          >
+            {showTranscript ? (
+              <>
+                <EyeOff size={16} />
+                Hide Transcript
+              </>
+            ) : (
+              <>
+                <Eye size={16} />
+                Show Transcript
+              </>
+            )}
+          </button>
+        )}
+      </div>
+
+      {/* Transcript section (conditionally rendered) */}
+      {showTranscript && hasTranscript && (
+        <div className="mb-4 p-4 bg-neutral-800 rounded-lg">
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="text-lg font-medium">Video Transcript</h3>
+            <button 
+              onClick={toggleEditTranscript}
+              className="flex items-center gap-1 px-2 py-1 bg-neutral-700 hover:bg-neutral-600 rounded-md text-xs transition-colors"
+            >
+              <Edit size={14} />
+              {isEditingTranscript ? 'Cancel' : 'Edit'}
+            </button>
+          </div>
+          
+          {isEditingTranscript ? (
+            <div className="flex flex-col gap-2">
+              <textarea 
+                value={editedTranscript} 
+                onChange={handleTranscriptChange}
+                className="w-full h-40 p-2 bg-neutral-900 border border-neutral-700 rounded-md text-sm"
+              />
+              <button 
+                onClick={saveEditedTranscript}
+                className="self-end px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded-md text-sm transition-colors"
+              >
+                Save Changes
+              </button>
+            </div>
+          ) : (
+            <div className="max-h-40 overflow-y-auto text-sm whitespace-pre-wrap">
+              {editedTranscript || transcript}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Chat messages */}
+      <div 
+        ref={chatRef}
+        className="flex-1 overflow-y-auto mb-4 space-y-4 min-h-[200px] max-h-[calc(100vh-300px)]"
+      >
+        {showInitialHeading && !hasTranscript ? (
+          <div className="flex flex-col items-center justify-center h-full text-center text-neutral-400">
+            <h3 className="text-xl font-medium mb-2">Welcome to ScribeLight</h3>
+            <p className="max-w-md">Enter a YouTube URL in the sidebar to get started. ScribeLight will transcribe the video and allow you to chat with its content.</p>
+          </div>
+        ) : (
+          messages.map((message, index) => {
+            // Skip rendering the transcript message in the chat
+            if (message.type === 'transcript') return null;
+            
+            const messageId = message.id || index;
+            const isCopied = copiedMessageId === messageId;
+            
+            return (
+              <div 
+                key={messageId} 
+                className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div 
+                  className={`max-w-[80%] p-3 rounded-lg ${message.type === 'user' 
+                    ? 'bg-blue-600 text-white rounded-tr-none' 
+                    : 'bg-neutral-800 text-white rounded-tl-none'}`}
+                >
+                  <div className="flex justify-between items-start mb-1">
+                    <span className="text-xs opacity-75">
+                      {message.type === 'user' ? 'You' : 'ScribeLight'}
+                    </span>
+                    
+                    {/* Copy button */}
+                    {message.content && (
+                      <button 
+                        onClick={() => copyMessageContent(message.content, messageId)}
+                        className="ml-2 p-1 text-xs opacity-50 hover:opacity-100 transition-opacity"
+                        title="Copy message"
+                      >
+                        {isCopied ? <Check size={14} /> : <Copy size={14} />}
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Message content with Markdown support */}
+                  <div className="prose prose-invert prose-sm max-w-none">
+                    <ReactMarkdown>{message.content}</ReactMarkdown>
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
+        
+        {/* Loading indicator */}
+        {loading && (
+          <div className="flex justify-center items-center py-4">
+            <AiLoader />
+          </div>
+        )}
+      </div>
+
+      {/* Input form */}
+      <form onSubmit={handleSubmit} className="flex gap-2">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Ask about the video content..."
+          className="flex-1 px-4 py-2 bg-neutral-800 border border-neutral-700 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-red-500"
+          disabled={!hasTranscript || loading}
+        />
+        <button
+          type="submit"
+          disabled={!hasTranscript || loading || !input.trim()}
+          className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Send
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default Chatbox;
