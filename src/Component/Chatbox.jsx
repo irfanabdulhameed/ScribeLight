@@ -310,11 +310,11 @@ const Chatbox = ({ transcript }) => {
       <div>
       {showInitialHeading && !hasTranscript && (
         <div className="flex flex-col items-center justify-center h-full ">
-          <h2 className="text-6xl font-semibold text-center bg-gradient-to-b from-white to-gray-400  bg-clip-text text-transparent font-space-grotesk">
-            Everything is Cooked here!<br />
-            Enter your Link
+          <h2 className="lg:text-6xl font-semibold text-center bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent font-space-grotesk md:text-5xl sm:text-4xl text-2xl">
+            Everything is Cooked here!<br /><span className='bg-gradient-to-b from-white to-gray-400 text-transparent bg-clip-text'>Enter your Link</span>
+            
           </h2>
-          <p className='text-white/50 pt-2 mb-10'>Use Scribe<span className='text-red-400/50'>Light</span> and en<span className='text-red-400/50'>Lighten</span> yourself</p>
+          <p className='text-white/50 pt-2 mb-10 lg:text-lg md:text-md sm:text-sm text-xs'>Use Scribe<span className='text-red-400/50'>Light</span> and en<span className='text-red-400/50'>Lighten</span> yourself</p>
         </div>
       )}
       <form onSubmit={handleSubmit} className="p-4 bg-neutral-900  border-neutral-800 mt-auto">

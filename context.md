@@ -48,4 +48,5 @@ Built with **React.js for the frontend** and **Flask for the backend**, ScribeLi
 
 ScribeLight is an essential tool for anyone who wants to **interact with video content in a smarter, more efficient way**—eliminating the need to watch lengthy videos while improving accessibility and comprehension. 🚀 -->
 
-The chatbox will have an initial center aligned heading that says "Everything is Cooked here! Enter your Link". this text will be hidden or removed when the user enters a link. 
+when text from the AI is selected in the chat, the add a button on the top of teh seletected text to highlight it in red or remove highlight.
+use https://github.com/abhinavNehra/get-selected-text for reference
