@@ -25,6 +25,7 @@ CORS(app, resources={r"/api/*": {"origins": CORS_ORIGIN}})
 client = genai.Client(api_key=GEMINI_API_KEY)
 
 # We'll load the Whisper model only when needed to save memory
+# Using the smallest model size to reduce memory usage
 whisper_model = None
 
 @app.route('/')
@@ -50,33 +51,43 @@ def transcribe_video():
         return jsonify({"error": "No URL provided"}), 400
 
     try:
-        # Lazy load the Whisper model only when needed
-        if whisper_model is None:
-            whisper_model = whisper.load_model("tiny")
-            
-        # Download audio from YouTube
-        with tempfile.TemporaryDirectory() as temp_dir:
-            ydl_opts = {
-                'format': 'bestaudio/best',
-                'outtmpl': os.path.join(temp_dir, '%(id)s.%(ext)s'),
-                'postprocessors': [{
-                    'key': 'FFmpegExtractAudio',
-                    'preferredcodec': 'mp3',
-                }],
-            }
-            
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                ydl.download([video_url])
-                info = ydl.extract_info(video_url, download=False)
-                audio_path = os.path.join(temp_dir, f"{info['id']}.mp3")
+        try:
+            # Lazy load the Whisper model only when needed - use the smallest model to save memory
+            if whisper_model is None:
+                whisper_model = whisper.load_model("tiny")
+                
+            # Download audio from YouTube with lower quality to save memory
+            with tempfile.TemporaryDirectory() as temp_dir:
+                ydl_opts = {
+                    'format': 'worstaudio/worst', # Use lowest quality audio to save memory
+                    'outtmpl': os.path.join(temp_dir, '%(id)s.%(ext)s'),
+                    'postprocessors': [{
+                        'key': 'FFmpegExtractAudio',
+                        'preferredcodec': 'mp3',
+                    }],
+                }
+                
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    ydl.download([video_url])
+                    info = ydl.extract_info(video_url, download=False)
+                    audio_path = os.path.join(temp_dir, f"{info['id']}.mp3")
 
-            # Transcribe audio
-            result = whisper_model.transcribe(audio_path)
-            transcript = result["text"]
-            
-            # Free up memory after transcription
-            del result
+                # Transcribe audio
+                result = whisper_model.transcribe(audio_path)
+                transcript = result["text"]
+                
+                # Free up memory after transcription
+                del result
+                
+            # Explicitly unload the model to free up memory
+            global whisper_model
+            whisper_model = None
             gc.collect()
+        except Exception as e:
+            # Ensure model is unloaded even if an error occurs
+            whisper_model = None
+            gc.collect()
+            raise e
 
         return jsonify({"transcript": transcript})
 
@@ -162,14 +173,13 @@ def process_text():
                 # Get the full text
                 full_text = response.text
                 
-                # Break the text into smaller chunks (e.g., sentences or paragraphs)
-                # For simplicity, we'll use a simple character-based chunking
-                chunk_size = 20  # Adjust this value as needed
+                # Break the text into larger chunks to reduce overhead
+                # Using larger chunks reduces the number of iterations and memory overhead
+                chunk_size = 100  # Increased chunk size to reduce iterations
                 for i in range(0, len(full_text), chunk_size):
                     chunk = full_text[i:i+chunk_size]
                     yield f"data: {json.dumps({'chunk': chunk})}\n\n"
-                    # Add a small delay to simulate streaming
-                    time.sleep(0.05)
+                    # Remove delay to reduce overall processing time
                 
                 # Send a final message to indicate the stream is complete
                 yield f"data: {json.dumps({'done': True})}\n\n"
