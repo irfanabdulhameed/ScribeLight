@@ -3,21 +3,26 @@ import Summarizebtn from "./summarize-btn";
 import ytLogo from "../assets/ytlogo.png";
 import paperImg from "../assets/paper.png";
 import lineImg from "../assets/line.png";
+import gridImg from "../assets/grid.png";
 
 export default function HeroSection() {
   return (
     <section
-      className="relative w-full py-16 md:py-24 lg:py-32 xl:py-48 bg-center bg-contain bg-no-repeat mb-20 md:mb-40"
-      style={{
-        backgroundImage: 'url("../src/assets/grid.png")',
-        backgroundSize: "100% 100%",
-      }}
+      className="relative w-full py-16 md:py-24 lg:py-32 xl:py-48 mb-20 md:mb-40"
     >
-      <div className="absolute top-20 md:top-40 left-0 md:left-14 w-60 md:w-80 h-60 md:h-80 sm:hide">
-        <img src={ytLogo} className="floating w-full hidden md:block"></img>
-      </div>{" "}
-      <div className="absolute top-20 md:top-40 right-0 md:right-20 w-60 md:w-80 h-60 md:h-80">
-        <img src={paperImg} className="floatingg w-full hidden md:block"></img>
+      <div 
+        className="absolute inset-0 bg-center bg-contain bg-no-repeat" 
+        style={{
+          backgroundImage: `url(${gridImg})`,
+          backgroundSize: "100% 100%",
+          opacity: 0.7,
+        }}
+      />
+      <div className="absolute top-20 md:top-40 left-0 md:left-14 w-60 md:w-80 h-60 md:h-80 hidden lg:block">
+        <img src={ytLogo} className="floating w-full"></img>
+      </div>
+      <div className="absolute top-20 md:top-40 right-0 md:right-20 w-60 md:w-80 h-60 md:h-80 hidden lg:block">
+        <img src={paperImg} className="floatingg w-full"></img>
       </div>
       <div className="absolute inset-0" />
       <div className="relative container mx-auto px-4 md:px-6 flex items-center justify-center min-h-full">
@@ -37,7 +42,7 @@ export default function HeroSection() {
               </span>
               <br className="md:block" />
               <span className="bg-gradient-to-b from-white to-gray-400 text-transparent bg-clip-text">
-                Youtube Videos in Seconds.
+              Youtube Videos in Seconds.
               </span>
             </h1>
             <p className="max-w-[600px] text-white text-sm md:text-base lg:text-lg mx-auto font-light text-center ">
