@@ -9,6 +9,7 @@ import yt_dlp
 import whisper
 import tempfile
 import time
+import gc
 
 app = Flask(__name__)
 
@@ -23,8 +24,8 @@ CORS(app, resources={r"/api/*": {"origins": CORS_ORIGIN}})
 # Configure Gemini with the new client approach
 client = genai.Client(api_key=GEMINI_API_KEY)
 
-# Initialize Whisper model for transcription
-whisper_model = whisper.load_model("tiny")
+# We'll load the Whisper model only when needed to save memory
+whisper_model = None
 
 @app.route('/')
 def hello_world():
@@ -41,6 +42,7 @@ def handle_options():
 
 @app.route('/api/transcribe', methods=['POST'])
 def transcribe_video():
+    global whisper_model
     data = request.json
     video_url = data.get('url')
 
@@ -48,6 +50,10 @@ def transcribe_video():
         return jsonify({"error": "No URL provided"}), 400
 
     try:
+        # Lazy load the Whisper model only when needed
+        if whisper_model is None:
+            whisper_model = whisper.load_model("tiny")
+            
         # Download audio from YouTube
         with tempfile.TemporaryDirectory() as temp_dir:
             ydl_opts = {
@@ -67,6 +73,10 @@ def transcribe_video():
             # Transcribe audio
             result = whisper_model.transcribe(audio_path)
             transcript = result["text"]
+            
+            # Free up memory after transcription
+            del result
+            gc.collect()
 
         return jsonify({"transcript": transcript})
 
@@ -177,12 +187,14 @@ def process_text():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
+    # Get port from environment variable with fallback
+    port = int(os.getenv('PORT', 8080))
+    
     # Use production settings when in production environment
     if os.getenv('FLASK_ENV') == 'production':
         # Production settings
         from waitress import serve
-        serve(app, host='0.0.0.0', port=int(os.getenv('PORT', 8080)))
+        serve(app, host='0.0.0.0', port=port)
     else:
         # Development settings
-        port = int(os.environ.get('PORT', 5000))
         app.run(host='0.0.0.0', port=port, debug=True)
