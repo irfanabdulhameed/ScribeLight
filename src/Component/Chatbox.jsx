@@ -310,7 +310,7 @@ const Chatbox = ({ transcript }) => {
       <div>
       {showInitialHeading && !hasTranscript && (
         <div className="flex flex-col items-center justify-center h-full ">
-          <h2 className="text-6xl font-semibold text-center text-white font-space-grotesk">
+          <h2 className="text-6xl font-semibold text-center bg-gradient-to-b from-white to-gray-400  bg-clip-text text-transparent font-space-grotesk">
             Everything is Cooked here!<br />
             Enter your Link
           </h2>
